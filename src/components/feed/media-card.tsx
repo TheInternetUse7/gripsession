@@ -30,7 +30,7 @@ export function MediaCard({ post, onClick }: MediaCardProps) {
 
     if (hasError) {
         return (
-            <div className="flex h-48 items-center justify-center rounded-xl bg-card/50 border border-border">
+            <div className="flex min-h-[200px] items-center justify-center rounded-xl bg-card/50 border border-border">
                 <p className="text-sm text-muted-foreground">Failed to load</p>
             </div>
         );
@@ -53,7 +53,7 @@ export function MediaCard({ post, onClick }: MediaCardProps) {
                 <video
                     ref={videoRef}
                     src={post.url}
-                    className="h-full w-full object-cover"
+                    className="w-full h-auto block"
                     loop
                     muted={isMuted}
                     playsInline
@@ -65,8 +65,8 @@ export function MediaCard({ post, onClick }: MediaCardProps) {
                     src={post.url}
                     alt={post.title}
                     width={400}
-                    height={300}
-                    className="w-full h-auto object-cover"
+                    height={600}
+                    className="w-full h-auto"
                     onLoad={handleLoadComplete}
                     onError={handleError}
                     unoptimized

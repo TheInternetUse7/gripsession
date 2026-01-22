@@ -10,13 +10,14 @@ interface MasonryGridProps {
 
 export function MasonryGrid({ posts, onPostClick }: MasonryGridProps) {
     return (
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        <div className="columns-1 gap-3 sm:columns-2 md:columns-3 lg:columns-4 xl:columns-5 2xl:columns-6">
             {posts.map((post) => (
-                <MediaCard
-                    key={post.id}
-                    post={post}
-                    onClick={() => onPostClick?.(post)}
-                />
+                <div key={post.id} className="mb-3 break-inside-avoid">
+                    <MediaCard
+                        post={post}
+                        onClick={() => onPostClick?.(post)}
+                    />
+                </div>
             ))}
         </div>
     );

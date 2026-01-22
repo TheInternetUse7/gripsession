@@ -7,6 +7,12 @@
 @tailwind utilities;
 
 @theme inline {
+  --breakpoint-sm: 640px;
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 1024px;
+  --breakpoint-xl: 1280px;
+  --breakpoint-2xl: 1536px;
+
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
@@ -85,6 +91,10 @@
 @layer base {
   * {
     @apply border-border outline-ring/50;
+  }
+
+  html, body {
+    @apply overflow-hidden h-full;
   }
 
   body {

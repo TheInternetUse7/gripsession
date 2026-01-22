@@ -64,7 +64,7 @@ export function MainLayout({ children }: { children: React.ReactNode }) {
       </aside>
 
       {/* Main Content Area */}
-      <main className="flex-1 overflow-auto">
+      <main className="flex-1 overflow-y-auto overflow-x-hidden">
         <div className="p-4 pb-24 md:pb-4">
           {children}
         </div>

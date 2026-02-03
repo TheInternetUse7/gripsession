@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useEffect, useRef } from 'react';
 import { useInfiniteQuery } from '@tanstack/react-query';
-import { getFeedAction } from '@/app/actions/get-feed';
+
 import { MasonryGrid } from '@/components/feed/masonry-grid';
 import { TheaterModal } from '@/components/viewer/theater-modal';
 import { useSessionStore } from '@/store/session-store';
@@ -26,7 +26,10 @@ export default function Home() {
   } = useInfiniteQuery({
     queryKey: ['feed', activeSource],
     queryFn: async ({ pageParam }) => {
-      return await getFeedAction(pageParam, { category: activeSource });
+      // Client-side fetching
+      const { RedditAdapter } = await import('@/lib/adapters/reddit-adapter');
+      const adapter = new RedditAdapter();
+      return await adapter.fetchFeed(pageParam, { category: activeSource });
     },
     initialPageParam: undefined as string | undefined,
     getNextPageParam: (lastPage) => lastPage.nextCursor,

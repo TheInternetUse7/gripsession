@@ -21,6 +21,8 @@ export default function Home() {
     hasNextPage,
     isFetchingNextPage,
     isLoading,
+    isError,
+    error
   } = useInfiniteQuery({
     queryKey: ['feed', activeSource],
     queryFn: async ({ pageParam }) => {
@@ -52,6 +54,27 @@ export default function Home() {
       setSelectedPost(uniquePosts[currentIndex + 1]);
     }
   };
+
+  if (isError) {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <h1 className="text-3xl font-bold tracking-tight">Feed</h1>
+        </div>
+        <div className="flex h-96 flex-col items-center justify-center rounded-lg border border-destructive/20 bg-destructive/10 p-8 text-center text-destructive">
+          <p className="text-lg font-semibold mb-2">Failed to load content</p>
+          <p className="text-sm text-foreground/70 mb-6 max-w-md">
+            This likely implies that Reddit is blocking requests from Vercel's IP addresses.
+          </p>
+          {error && (
+            <div className="w-full max-w-md overflow-hidden rounded bg-black/50 p-4 font-mono text-xs text-left text-muted-foreground">
+              {error.message}
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">

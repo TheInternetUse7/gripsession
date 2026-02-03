@@ -10,6 +10,6 @@ export async function getFeedAction(cursor?: string, filters: FilterOptions = {}
         return await adapter.fetchFeed(cursor, filters);
     } catch (error) {
         console.error('Fetch Feed Error:', error);
-        return { posts: [], nextCursor: undefined };
+        throw error;
     }
 }

@@ -31,7 +31,7 @@ export class RedditAdapter implements ContentAdapter {
             return { posts, nextCursor };
         } catch (error) {
             console.error('Reddit API Error:', error);
-            return { posts: [], nextCursor: undefined };
+            throw error;
         }
     }
 

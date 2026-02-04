@@ -1,22 +1,20 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
-import QueryProvider from "@/providers/query-provider";
-import { MainLayout } from "@/components/layout/main-layout";
+import { Playfair_Display, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const playfair = Playfair_Display({
+  variable: "--font-serif",
   subsets: ["latin"],
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const jetbrainsMono = JetBrains_Mono({
+  variable: "--font-mono",
   subsets: ["latin"],
 });
 
 export const metadata: Metadata = {
-  title: "Gripsession",
-  description: "A specialized media viewer",
+  title: "GRIPSESSION",
+  description: "Digital Brutalism",
 };
 
 export default function RootLayout({
@@ -25,13 +23,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning className="dark">
+    <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${playfair.variable} ${jetbrainsMono.variable} antialiased bg-black text-white`}
       >
-        <QueryProvider>
-          <MainLayout>{children}</MainLayout>
-        </QueryProvider>
+        {children}
       </body>
     </html>
   );

@@ -7,9 +7,10 @@ import clsx from "clsx";
 
 interface CardProps {
     item: MediaItem;
+    onClick?: () => void;
 }
 
-export function Card({ item }: CardProps) {
+export function Card({ item, onClick }: CardProps) {
     const videoRef = useRef<HTMLVideoElement>(null);
     const { settings, favorites, addFavorite, removeFavorite } = useStore();
     const [isPlaying, setIsPlaying] = useState(false);
@@ -57,7 +58,7 @@ export function Card({ item }: CardProps) {
 
     if (item.type === "image") {
         return (
-            <div className="relative w-full bg-neutral-900 group cursor-pointer">
+            <div className="relative w-full bg-neutral-900 group cursor-pointer" onClick={onClick}>
                 <img
                     src={item.url}
                     alt={item.title}
@@ -82,7 +83,7 @@ export function Card({ item }: CardProps) {
     }
 
     return (
-        <div className="relative w-full bg-neutral-900 group cursor-pointer">
+        <div className="relative w-full bg-neutral-900 group cursor-pointer" onClick={onClick}>
             <video
                 ref={videoRef}
                 src={item.url}

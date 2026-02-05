@@ -6,18 +6,20 @@ import { Card } from "./Card";
 
 interface MasonryGridProps {
     items: MediaItem[];
+    onItemClick?: (item: MediaItem) => void;
 }
 
-export function MasonryGrid({ items }: MasonryGridProps) {
+export function MasonryGrid({ items, onItemClick }: MasonryGridProps) {
     return (
         <ResponsiveMasonry
             columnsCountBreakPoints={{ 350: 1, 750: 2, 900: 3, 1200: 4, 1600: 5 }}
         >
             <Masonry gutter="0px">
                 {items.map((item) => (
-                    <Card key={item.id} item={item} />
+                    <Card key={item.id} item={item} onClick={() => onItemClick?.(item)} />
                 ))}
             </Masonry>
         </ResponsiveMasonry>
     );
 }
+

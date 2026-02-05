@@ -1,18 +1,21 @@
 "use client";
 
 import useSWRInfinite from 'swr/infinite';
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, useState } from 'react';
 import { Header } from "@/components/ui/Header";
 import { MasonryGrid } from "@/components/feed/MasonryGrid";
+import { Modal } from "@/components/ui/Modal";
 import { useStore } from "@/lib/store";
 import { fetchFeed } from "@/lib/parsers/reddit";
+import { MediaItem } from "@/lib/types";
 
 export default function Home() {
   const { kinks } = useStore();
   const observerRef = useRef<HTMLDivElement>(null);
+  const [selectedItem, setSelectedItem] = useState<MediaItem | null>(null);
 
   const getKey = (pageIndex: number, previousPageData: any) => {
-    if (pageIndex > 0 && !previousPageData?.after) return null; // Reached end
+    if (pageIndex > 0 && !previousPageData?.after) return null;
     if (pageIndex === 0) return ['feed', kinks, null];
     return ['feed', kinks, previousPageData.after];
   }
@@ -51,7 +54,7 @@ export default function Home() {
       <Header />
 
       <div className="p-1">
-        <MasonryGrid items={items} />
+        <MasonryGrid items={items} onItemClick={setSelectedItem} />
 
         <div ref={observerRef} className="h-20 w-full flex items-center justify-center py-8">
           {isLoadingMore && (
@@ -62,6 +65,8 @@ export default function Home() {
           {error && <div className="text-red-500 font-mono text-xs">FAILED TO LOAD</div>}
         </div>
       </div>
+
+      <Modal item={selectedItem} onClose={() => setSelectedItem(null)} />
     </main>
   );
 }

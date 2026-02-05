@@ -12,7 +12,7 @@ interface CardProps {
 
 export function Card({ item, onClick }: CardProps) {
     const videoRef = useRef<HTMLVideoElement>(null);
-    const { settings, favorites, addFavorite, removeFavorite } = useStore();
+    const { settings, favorites, addFavorite, removeFavorite, markViewed } = useStore();
     const [isPlaying, setIsPlaying] = useState(false);
     const [isLoaded, setIsLoaded] = useState(false);
     const [hasError, setHasError] = useState(false);
@@ -28,8 +28,13 @@ export function Card({ item, onClick }: CardProps) {
         }
     };
 
+    const handleClick = () => {
+        markViewed(item.id);
+        onClick?.();
+    };
+
     useEffect(() => {
-        if (item.type !== "video") return;
+        if (item.type !== "video" || !settings.autoplay) return;
 
         const observer = new IntersectionObserver(
             (entries) => {
@@ -53,7 +58,7 @@ export function Card({ item, onClick }: CardProps) {
         return () => {
             observer.disconnect();
         };
-    }, [item.type]);
+    }, [item.type, settings.autoplay]);
 
     // Reset loading state when item changes
     useEffect(() => {
@@ -76,9 +81,20 @@ export function Card({ item, onClick }: CardProps) {
         </div>
     );
 
+    const TitleOverlay = () => (
+        settings.showTitles !== 'never' && (
+            <div className={clsx(
+                "absolute bottom-0 left-0 right-0 p-2 bg-black/80",
+                settings.showTitles === 'hover' && "opacity-0 group-hover:opacity-100 transition-opacity"
+            )}>
+                <p className="text-xs font-mono truncate">{item.title}</p>
+            </div>
+        )
+    );
+
     if (item.type === "image") {
         return (
-            <div className="relative w-full bg-neutral-900 group cursor-pointer min-h-[200px]" onClick={onClick}>
+            <div className="relative w-full bg-neutral-900 group cursor-pointer min-h-[200px]" onClick={handleClick}>
                 {!isLoaded && !hasError && <Skeleton />}
                 {hasError && <ErrorState />}
                 <img
@@ -105,12 +121,13 @@ export function Card({ item, onClick }: CardProps) {
                         {isSaved ? "[SAVED]" : "[SAVE]"}
                     </button>
                 </div>
+                <TitleOverlay />
             </div>
         );
     }
 
     return (
-        <div className="relative w-full bg-neutral-900 group cursor-pointer min-h-[200px]" onClick={onClick}>
+        <div className="relative w-full bg-neutral-900 group cursor-pointer min-h-[200px]" onClick={handleClick}>
             {!isLoaded && !hasError && <Skeleton />}
             {hasError && <ErrorState />}
             <video
@@ -120,7 +137,7 @@ export function Card({ item, onClick }: CardProps) {
                     "w-full h-auto object-cover block transition-opacity duration-300",
                     isLoaded ? "opacity-100" : "opacity-0"
                 )}
-                loop
+                loop={settings.loopVideos}
                 muted={settings.muted}
                 playsInline
                 onLoadedData={() => setIsLoaded(true)}
@@ -144,6 +161,7 @@ export function Card({ item, onClick }: CardProps) {
                     <span className="text-white font-mono text-xs bg-black px-1">PAUSED</span>
                 </div>
             )}
+            <TitleOverlay />
         </div>
     );
 }

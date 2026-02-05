@@ -1,4 +1,4 @@
-import { MediaItem } from '@/lib/types';
+import { MediaItem, AppSettings } from '@/lib/types';
 
 interface RedditPost {
     data: {
@@ -41,10 +41,22 @@ export interface RedditResponse {
     after: string | null;
 }
 
-export async function fetchFeed(subreddits: string[], after: string | null = null): Promise<RedditResponse> {
+export async function fetchFeed(
+    subreddits: string[],
+    after: string | null = null,
+    settings: AppSettings
+): Promise<RedditResponse> {
     const query = subreddits.join('+');
-    // Use old.reddit.com to avoid mobile redirects
-    let url = `https://old.reddit.com/r/${query}/hot.json?limit=25&raw_json=1`;
+
+    // Build URL with sort and timeframe
+    let urlPath: string;
+    if (settings.sortBy === 'top' && settings.topTimeframe) {
+        urlPath = `top.json?t=${settings.topTimeframe}`;
+    } else {
+        urlPath = `${settings.sortBy}.json`;
+    }
+
+    let url = `https://old.reddit.com/r/${query}/${urlPath}?limit=${settings.postsPerLoad}&raw_json=1`;
     if (after) {
         url += `&after=${after}`;
     }
@@ -112,6 +124,12 @@ export async function fetchFeed(subreddits: string[], after: string | null = nul
             if (!isDirectImage && !isDirectVideo) return null;
             if (type === 'video' && url.includes('redgifs.com/watch')) return null;
 
+            // Apply media type filters
+            const isGif = url.endsWith('.gif');
+            if (type === 'image' && !isGif && !settings.allowImages) return null;
+            if (type === 'image' && isGif && !settings.allowGifs) return null;
+            if (type === 'video' && !settings.allowVideos) return null;
+
             return {
                 id: data.id,
                 url: url,
@@ -120,6 +138,7 @@ export async function fetchFeed(subreddits: string[], after: string | null = nul
                 aspectRatio: aspectRatio,
                 sourceUrl: `https://reddit.com${data.permalink}`,
                 title: data.title,
+                source: 'reddit',
             };
         })
         .filter((item): item is MediaItem => item !== null);

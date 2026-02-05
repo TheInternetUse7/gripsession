@@ -4,8 +4,9 @@
   --font-serif: var(--font-serif);
   --font-mono: var(--font-mono);
 
-  --color-background: #000000;
-  --color-foreground: #ffffff;
+  /* Theme overrides via CSS vars */
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
 
   --radius-none: 0px;
   --radius-sm: 0px;
@@ -17,7 +18,18 @@
   --radius-3xl: 0px;
 }
 
-:root {
+:root,
+[data-theme="dark"] {
+  --background: #000000;
+  --foreground: #ffffff;
+}
+
+[data-theme="light"] {
+  --background: #ffffff;
+  --foreground: #000000;
+}
+
+[data-theme="oled"] {
   --background: #000000;
   --foreground: #ffffff;
 }

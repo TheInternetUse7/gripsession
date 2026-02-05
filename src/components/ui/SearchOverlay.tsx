@@ -5,6 +5,7 @@ import { Input } from "./Input";
 import useSWR from "swr";
 import { fetchFeed } from "@/lib/parsers/reddit";
 import { MasonryGrid } from "@/components/feed/MasonryGrid";
+import { useStore } from "@/lib/store";
 
 interface SearchOverlayProps {
     isOpen: boolean;
@@ -12,12 +13,13 @@ interface SearchOverlayProps {
 }
 
 export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
+    const { settings } = useStore();
     const [query, setQuery] = useState("");
     const [activeSearch, setActiveSearch] = useState<string | null>(null);
 
     const { data, isLoading } = useSWR(
-        activeSearch ? ['search', activeSearch] : null,
-        ([, q]) => fetchFeed([q], null),
+        activeSearch ? ['search', activeSearch, settings] : null,
+        ([, q]) => fetchFeed([q], null, settings),
         { revalidateOnFocus: false }
     );
 

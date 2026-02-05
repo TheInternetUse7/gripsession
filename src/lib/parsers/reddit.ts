@@ -43,14 +43,17 @@ export interface RedditResponse {
 
 export async function fetchFeed(subreddits: string[], after: string | null = null): Promise<RedditResponse> {
     const query = subreddits.join('+');
-    // Limit to 25 for performance
-    let url = `https://www.reddit.com/r/${query}/hot.json?limit=25`;
+    // Use old.reddit.com to avoid mobile redirects
+    let url = `https://old.reddit.com/r/${query}/hot.json?limit=25&raw_json=1`;
     if (after) {
         url += `&after=${after}`;
     }
 
     const response = await fetch(url, {
         cache: 'no-store',
+        headers: {
+            'Accept': 'application/json',
+        },
     });
 
     if (!response.ok) {

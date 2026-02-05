@@ -1,7 +1,7 @@
 "use client";
 
 import useSWRInfinite from 'swr/infinite';
-import { useRef, useEffect, useState } from 'react';
+import { useRef, useEffect, useState, useMemo, useCallback } from 'react';
 import { Header } from "@/components/ui/Header";
 import { MasonryGrid } from "@/components/feed/MasonryGrid";
 import { Modal } from "@/components/ui/Modal";
@@ -14,38 +14,71 @@ export default function Home() {
   const observerRef = useRef<HTMLDivElement>(null);
   const [selectedItem, setSelectedItem] = useState<MediaItem | null>(null);
 
-  // Get active subs
-  const activeSubs = subs.filter(s => s.enabled && s.source === 'reddit').map(s => s.name);
+  // Create stable references for subs and settings
+  const activeSubs = useMemo(
+    () => subs.filter(s => s.enabled && s.source === 'reddit').map(s => s.name),
+    [subs]
+  );
 
-  const getKey = (pageIndex: number, previousPageData: any) => {
-    if (activeSubs.length === 0) return null;
+  const subsKey = useMemo(() => activeSubs.join('+'), [activeSubs]);
+
+  // Use refs to avoid closure issues in fetcher
+  const settingsRef = useRef(settings);
+  const activeSubsRef = useRef(activeSubs);
+  useEffect(() => {
+    settingsRef.current = settings;
+    activeSubsRef.current = activeSubs;
+  }, [settings, activeSubs]);
+
+  // Stable cache key that only changes when feed-affecting settings change
+  const cacheKey = useMemo(
+    () => `${subsKey}:${settings.sortBy}:${settings.topTimeframe || 'day'}:${settings.postsPerLoad}`,
+    [subsKey, settings.sortBy, settings.topTimeframe, settings.postsPerLoad]
+  );
+
+  const getKey = useCallback((pageIndex: number, previousPageData: any) => {
+    if (activeSubsRef.current.length === 0) return null;
     if (pageIndex > 0 && !previousPageData?.after) return null;
-    if (pageIndex === 0) return ['feed', activeSubs, null, settings];
-    return ['feed', activeSubs, previousPageData.after, settings];
-  }
+    if (pageIndex === 0) return ['feed', cacheKey, null];
+    return ['feed', cacheKey, previousPageData.after];
+  }, [cacheKey]);
+
+  // Stable fetcher using refs
+  const fetcher = useCallback(async ([, , after]: [string, string, string | null]) => {
+    return fetchFeed(activeSubsRef.current, after, settingsRef.current);
+  }, []);
 
   const { data, size, setSize, isLoading, error } = useSWRInfinite(
     getKey,
-    ([, subs, after]) => fetchFeed(subs, after, settings),
+    fetcher,
     {
       revalidateOnFocus: false,
+      revalidateOnReconnect: false,
+      revalidateIfStale: false,
+      revalidateFirstPage: false,
       persistSize: true,
+      parallel: false,
+      dedupingInterval: 10000,
+      errorRetryCount: 0,
     }
   );
 
-  // Apply hideViewed filter
-  const items = data
-    ? data.flatMap(d => d.items)
-      .filter(item => !settings.hideViewed || !viewedItems.has(item.id))
-    : [];
+  // Apply client-side filters (hideViewed)
+  const items = useMemo(
+    () => data
+      ? data.flatMap(d => d.items)
+        .filter(item => !settings.hideViewed || !viewedItems.has(item.id))
+      : [],
+    [data, settings.hideViewed, viewedItems]
+  );
 
   const isLoadingMore = isLoading || (size > 0 && data && typeof data[size - 1] === "undefined");
 
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
-        if (entries[0].isIntersecting && !isLoadingMore) {
-          setSize(size + 1);
+        if (entries[0].isIntersecting && !isLoadingMore && !error) {
+          setSize(s => s + 1);
         }
       },
       { threshold: 1.0 }
@@ -56,7 +89,7 @@ export default function Home() {
     }
 
     return () => observer.disconnect();
-  }, [isLoadingMore, setSize, size]);
+  }, [isLoadingMore, setSize, error]);
 
   return (
     <main className="min-h-screen bg-black text-white">
@@ -77,7 +110,11 @@ export default function Home() {
                   LOADING MORE...
                 </div>
               )}
-              {error && <div className="text-red-500 font-mono text-xs">FAILED TO LOAD</div>}
+              {error && (
+                <div className="text-red-500 font-mono text-xs">
+                  {error?.status === 429 ? 'RATE LIMITED - PLEASE WAIT' : 'FAILED TO LOAD'}
+                </div>
+              )}
             </div>
           </>
         )}

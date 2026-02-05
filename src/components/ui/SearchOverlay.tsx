@@ -17,10 +17,16 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
     const [query, setQuery] = useState("");
     const [activeSearch, setActiveSearch] = useState<string | null>(null);
 
-    const { data, isLoading } = useSWR(
-        activeSearch ? ['search', activeSearch, settings] : null,
+    const { data, isLoading, error } = useSWR(
+        activeSearch ? ['search', activeSearch] : null,
         ([, q]) => fetchFeed([q], null, settings),
-        { revalidateOnFocus: false }
+        {
+            revalidateOnFocus: false,
+            revalidateOnReconnect: false,
+            dedupingInterval: 5000,
+            errorRetryCount: 2,
+            errorRetryInterval: 3000,
+        }
     );
 
     const handleSearch = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -79,6 +85,12 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
                 {!activeSearch && !isLoading && (
                     <div className="flex items-center justify-center h-full font-mono text-sm text-neutral-500">
                         TYPE A SUBREDDIT AND HIT ENTER
+                    </div>
+                )}
+
+                {error && (
+                    <div className="flex items-center justify-center h-full font-mono text-sm text-red-500">
+                        FAILED TO SEARCH - TRY AGAIN
                     </div>
                 )}
 

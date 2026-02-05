@@ -69,7 +69,9 @@ export async function fetchFeed(
     });
 
     if (!response.ok) {
-        throw new Error('Failed to fetch reddit feed');
+        const error = new Error(`Failed to fetch reddit feed: ${response.status}`) as Error & { status: number };
+        error.status = response.status;
+        throw error;
     }
 
     const json = await response.json();

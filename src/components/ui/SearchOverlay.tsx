@@ -6,6 +6,8 @@ import useSWR from "swr";
 import { fetchFeed } from "@/lib/parsers/reddit";
 import { MasonryGrid } from "@/components/feed/MasonryGrid";
 import { useStore } from "@/lib/store";
+import { MediaItem } from "@/lib/types";
+import { Modal } from "./Modal";
 
 interface SearchOverlayProps {
     isOpen: boolean;
@@ -16,6 +18,7 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
     const { settings } = useStore();
     const [query, setQuery] = useState("");
     const [activeSearch, setActiveSearch] = useState<string | null>(null);
+    const [selectedItem, setSelectedItem] = useState<MediaItem | null>(null);
 
     const { data, isLoading, error } = useSWR(
         activeSearch ? ['search', activeSearch] : null,
@@ -39,6 +42,7 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
     useEffect(() => {
         const handleEsc = (e: KeyboardEvent) => {
             if (e.key === 'Escape') {
+                if (selectedItem) return;
                 onClose();
                 setQuery("");
                 setActiveSearch(null);
@@ -50,7 +54,7 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
         }
 
         return () => document.removeEventListener('keydown', handleEsc);
-    }, [isOpen, onClose]);
+    }, [isOpen, onClose, selectedItem]);
 
     if (!isOpen) return null;
 
@@ -95,8 +99,10 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
                     </div>
                 )}
 
-                {data && <MasonryGrid items={data.items} />}
+                {data && <MasonryGrid items={data.items} onItemClick={setSelectedItem} />}
             </div>
+
+            <Modal item={selectedItem} onClose={() => setSelectedItem(null)} />
         </div>
     );
 }

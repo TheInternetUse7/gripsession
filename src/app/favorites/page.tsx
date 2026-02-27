@@ -1,11 +1,15 @@
 "use client";
 
+import { useState } from "react";
 import { Header } from "@/components/ui/Header";
 import { MasonryGrid } from "@/components/feed/MasonryGrid";
 import { useStore } from "@/lib/store";
+import { MediaItem } from "@/lib/types";
+import { Modal } from "@/components/ui/Modal";
 
 export default function FavoritesPage() {
   const { favorites } = useStore();
+  const [selectedItem, setSelectedItem] = useState<MediaItem | null>(null);
 
   return (
     <main className="min-h-screen bg-black text-white">
@@ -19,9 +23,11 @@ export default function FavoritesPage() {
             NO SAVED ITEMS
           </div>
         ) : (
-          <MasonryGrid items={favorites} />
+          <MasonryGrid items={favorites} onItemClick={setSelectedItem} />
         )}
       </div>
+
+      <Modal item={selectedItem} onClose={() => setSelectedItem(null)} />
     </main>
   );
 }

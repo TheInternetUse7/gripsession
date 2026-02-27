@@ -58,7 +58,7 @@ export default function Home() {
     return fetchFeed(activeSubsRef.current, after, settingsRef.current);
   }, []);
 
-  const { data, size, setSize, isLoading, error } = useSWRInfinite(
+  const { data, size, setSize, isLoading, isValidating, error } = useSWRInfinite(
     getKey,
     fetcher,
     {
@@ -69,7 +69,8 @@ export default function Home() {
       persistSize: true,
       parallel: false,
       dedupingInterval: 10000,
-      errorRetryCount: 0,
+      errorRetryCount: 2,
+      errorRetryInterval: 3000,
     }
   );
 
@@ -83,13 +84,15 @@ export default function Home() {
   );
 
   const hasPendingPage = Boolean(size > 0 && data && typeof data[size - 1] === "undefined");
-  const isLoadingMore = !error && (isLoading || hasPendingPage);
+  const hasMore = Boolean(data?.[size - 1]?.after);
+  const isLoadingMore = !error && (isLoading || isValidating || hasPendingPage);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
-        if (entries[0].isIntersecting && !isLoadingMore && !error) {
-          setSize(s => s + 1);
+        if (entries[0].isIntersecting && hasMore && !isLoadingMore && !error) {
+          // Increment by one page per render cycle to avoid burst requests.
+          setSize(size + 1);
         }
       },
       { threshold: 1.0 }
@@ -100,7 +103,7 @@ export default function Home() {
     }
 
     return () => observer.disconnect();
-  }, [isLoadingMore, setSize, error]);
+  }, [hasMore, isLoadingMore, setSize, size, error]);
 
   return (
     <main className="min-h-screen bg-black text-white">

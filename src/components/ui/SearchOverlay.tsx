@@ -30,8 +30,9 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
     );
 
     const handleSearch = (e: React.KeyboardEvent<HTMLInputElement>) => {
-        if (e.key === 'Enter' && query.trim()) {
-            setActiveSearch(query.trim());
+        const cleanQuery = query.trim().toLowerCase().replace(/^r\//, '');
+        if (e.key === 'Enter' && cleanQuery) {
+            setActiveSearch(cleanQuery);
         }
     };
 

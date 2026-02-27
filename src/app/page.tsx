@@ -82,7 +82,8 @@ export default function Home() {
     [data, settings.hideViewed, viewedItems]
   );
 
-  const isLoadingMore = isLoading || (size > 0 && data && typeof data[size - 1] === "undefined");
+  const hasPendingPage = Boolean(size > 0 && data && typeof data[size - 1] === "undefined");
+  const isLoadingMore = !error && (isLoading || hasPendingPage);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -115,14 +116,14 @@ export default function Home() {
             <MasonryGrid items={items} onItemClick={setSelectedItem} />
 
             <div ref={observerRef} className="h-20 w-full flex items-center justify-center py-8">
-              {isLoadingMore && (
-                <div className="font-mono text-xs text-neutral-500 animate-pulse">
-                  LOADING MORE...
-                </div>
-              )}
               {error && (
                 <div className="text-red-500 font-mono text-xs">
                   {error?.status === 429 ? 'RATE LIMITED - PLEASE WAIT' : 'FAILED TO LOAD'}
+                </div>
+              )}
+              {!error && isLoadingMore && (
+                <div className="font-mono text-xs text-neutral-500 animate-pulse">
+                  LOADING MORE...
                 </div>
               )}
             </div>

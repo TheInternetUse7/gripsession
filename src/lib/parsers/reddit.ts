@@ -48,15 +48,17 @@ export async function fetchFeed(
 ): Promise<RedditResponse> {
     const query = subreddits.join('+');
 
-    // Build URL with sort and timeframe
-    let urlPath: string;
+    const urlPath = settings.sortBy === 'top' ? 'top.json' : `${settings.sortBy}.json`;
+    const params = new URLSearchParams({
+        limit: String(settings.postsPerLoad),
+        raw_json: '1',
+    });
+
     if (settings.sortBy === 'top' && settings.topTimeframe) {
-        urlPath = `top.json?t=${settings.topTimeframe}`;
-    } else {
-        urlPath = `${settings.sortBy}.json`;
+        params.set('t', settings.topTimeframe);
     }
 
-    let url = `https://old.reddit.com/r/${query}/${urlPath}?limit=${settings.postsPerLoad}&raw_json=1`;
+    let url = `https://old.reddit.com/r/${query}/${urlPath}?${params.toString()}`;
     if (after) {
         url += `&after=${after}`;
     }

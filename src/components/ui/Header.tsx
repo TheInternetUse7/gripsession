@@ -13,25 +13,25 @@ export function Header() {
 
     return (
         <>
-            <header className="sticky top-0 z-50 w-full border-b border-white bg-black px-4 py-3">
+            <header className="sticky top-0 z-50 w-full border-b border-border bg-background px-4 py-3">
                 <div className="flex items-center justify-between">
-                    <Link href="/" className="font-serif text-3xl font-bold tracking-tighter text-white uppercase antialiased">
+                    <Link href="/" className="font-serif text-3xl font-bold tracking-tighter text-foreground uppercase antialiased">
                         Gripsession
                     </Link>
                     <div className="flex gap-4 items-center">
                         <button
                             onClick={() => setShowSearch(true)}
-                            className="font-mono text-sm uppercase text-gray-400 hover:text-white"
+                            className="font-mono text-sm uppercase text-muted hover:text-foreground"
                         >
                             [SEARCH]
                         </button>
-                        <Link href="/settings" className="font-mono text-sm uppercase text-gray-400 hover:text-white">
+                        <Link href="/settings" className="font-mono text-sm uppercase text-muted hover:text-foreground">
                             [SETTINGS]
                         </Link>
-                        <Link href="/favorites" className="font-mono text-sm uppercase text-gray-400 hover:text-white">
+                        <Link href="/favorites" className="font-mono text-sm uppercase text-muted hover:text-foreground">
                             [SAVED]
                         </Link>
-                        <span className="font-mono text-xs text-neutral-500">
+                        <span className="font-mono text-xs text-muted">
                             {activeSubs.length} SUBS
                         </span>
                     </div>

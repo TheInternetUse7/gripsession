@@ -12,7 +12,7 @@ interface CardProps {
 
 function SkeletonOverlay() {
     return (
-        <div className="absolute inset-0 bg-neutral-900 flex items-center justify-center">
+        <div className="absolute inset-0 bg-surface flex items-center justify-center">
             <div className="flex flex-col items-center gap-2">
                 <div className="w-8 h-8 border-2 border-neutral-700 border-t-white animate-spin" />
                 <span className="font-mono text-xs text-neutral-600 animate-pulse">LOADING</span>
@@ -23,7 +23,7 @@ function SkeletonOverlay() {
 
 function ErrorOverlay() {
     return (
-        <div className="absolute inset-0 bg-neutral-900 flex items-center justify-center">
+        <div className="absolute inset-0 bg-surface flex items-center justify-center">
             <span className="font-mono text-xs text-red-500">[FAILED]</span>
         </div>
     );
@@ -40,7 +40,7 @@ function TitleOverlay({ showTitles, title }: TitleOverlayProps) {
     return (
         <div
             className={clsx(
-                "absolute bottom-0 left-0 right-0 p-2 bg-black/80",
+                "absolute bottom-0 left-0 right-0 p-2 bg-background/80",
                 showTitles === 'hover' && "opacity-0 group-hover:opacity-100 transition-opacity"
             )}
         >
@@ -105,7 +105,7 @@ function CardContent({ item, onClick }: CardProps) {
 
     if (item.type === "image") {
         return (
-            <div className="relative w-full bg-neutral-900 group cursor-pointer min-h-[200px]" onClick={handleClick}>
+            <div className="relative w-full bg-surface group cursor-pointer min-h-[200px]" onClick={handleClick}>
                 {!isLoaded && !hasError && <SkeletonOverlay />}
                 {hasError && <ErrorOverlay />}
                 <img
@@ -125,8 +125,8 @@ function CardContent({ item, onClick }: CardProps) {
                         className={clsx(
                             "font-mono text-xs px-2 py-1 border",
                             isSaved
-                                ? "bg-white text-black border-white"
-                                : "bg-black text-white border-white hover:bg-white hover:text-black"
+                                ? "bg-foreground text-background border-border"
+                                : "bg-background text-foreground border-border hover:bg-foreground hover:text-background"
                         )}
                     >
                         {isSaved ? "[SAVED]" : "[SAVE]"}
@@ -138,7 +138,7 @@ function CardContent({ item, onClick }: CardProps) {
     }
 
     return (
-        <div className="relative w-full bg-neutral-900 group cursor-pointer min-h-[200px]" onClick={handleClick}>
+        <div className="relative w-full bg-surface group cursor-pointer min-h-[200px]" onClick={handleClick}>
             {!isLoaded && !hasError && <SkeletonOverlay />}
             {hasError && <ErrorOverlay />}
             <video
@@ -160,8 +160,8 @@ function CardContent({ item, onClick }: CardProps) {
                     className={clsx(
                         "font-mono text-xs px-2 py-1 border",
                         isSaved
-                            ? "bg-white text-black border-white"
-                            : "bg-black text-white border-white hover:bg-white hover:text-black"
+                            ? "bg-foreground text-background border-border"
+                            : "bg-background text-foreground border-border hover:bg-foreground hover:text-background"
                     )}
                 >
                     {isSaved ? "[SAVED]" : "[SAVE]"}
@@ -169,7 +169,7 @@ function CardContent({ item, onClick }: CardProps) {
             </div>
             {isLoaded && !isPlaying && (
                 <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity">
-                    <span className="text-white font-mono text-xs bg-black px-1">PAUSED</span>
+                    <span className="text-foreground font-mono text-xs bg-background px-1">PAUSED</span>
                 </div>
             )}
             <TitleOverlay showTitles={settings.showTitles} title={item.title} />

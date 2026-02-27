@@ -47,42 +47,42 @@ export function SubsManager() {
                 />
                 <button
                     onClick={handleAdd}
-                    className="px-4 py-2 bg-white text-black font-mono text-xs uppercase border border-white hover:bg-black hover:text-white transition-colors"
+                    className="px-4 py-2 bg-foreground text-background font-mono text-xs uppercase border border-border hover:bg-background hover:text-foreground transition-colors"
                 >
                     [ADD]
                 </button>
             </div>
 
             {/* Subs List */}
-            <div className="border border-neutral-700">
-                <div className="border-b border-neutral-700 p-2 bg-neutral-900">
-                    <span className="font-mono text-xs text-neutral-400">
+            <div className="border border-border">
+                <div className="border-b border-border p-2 bg-surface">
+                    <span className="font-mono text-xs text-muted">
                         {subs.filter(s => s.enabled).length} / {subs.length} ACTIVE
                     </span>
                 </div>
                 <div className="max-h-96 overflow-y-auto">
                     {subs.length === 0 ? (
-                        <div className="p-8 text-center font-mono text-sm text-neutral-500">
+                        <div className="p-8 text-center font-mono text-sm text-muted">
                             NO SUBS ADDED
                         </div>
                     ) : (
                         subs.map((sub) => (
                             <div
                                 key={sub.name}
-                                className="flex items-center gap-3 p-3 border-b border-neutral-800 last:border-b-0 hover:bg-neutral-900 transition-colors"
+                                className="flex items-center gap-3 p-3 border-b border-border last:border-b-0 hover:bg-surface transition-colors"
                             >
                                 <button
                                     onClick={() => toggleSub(sub.name)}
                                     className={clsx(
-                                        "w-5 h-5 border border-white flex items-center justify-center transition-colors",
-                                        sub.enabled ? "bg-white" : "bg-black"
+                                        "w-5 h-5 border border-border flex items-center justify-center transition-colors",
+                                        sub.enabled ? "bg-foreground text-background" : "bg-background text-muted"
                                     )}
                                 >
                                     {sub.enabled && (
                                         <svg className="w-3 h-3" viewBox="0 0 12 12">
                                             <path
                                                 d="M2 6 L5 9 L10 3"
-                                                stroke="black"
+                                                stroke="currentColor"
                                                 strokeWidth="2"
                                                 fill="none"
                                             />
@@ -92,14 +92,14 @@ export function SubsManager() {
                                 <div className="flex-1">
                                     <span className={clsx(
                                         "font-mono text-sm",
-                                        sub.enabled ? "text-white" : "text-neutral-500"
+                                        sub.enabled ? "text-foreground" : "text-muted"
                                     )}>
                                         r/{sub.name}
                                     </span>
                                 </div>
                                 <button
                                     onClick={() => removeSub(sub.name)}
-                                    className="font-mono text-xs px-2 py-1 border border-neutral-700 hover:border-white hover:text-white transition-colors text-neutral-500"
+                                    className="font-mono text-xs px-2 py-1 border border-border hover:bg-foreground hover:text-background transition-colors text-muted"
                                 >
                                     [REMOVE]
                                 </button>
@@ -111,7 +111,7 @@ export function SubsManager() {
 
             {/* Quick Add */}
             <div>
-                <div className="font-mono text-xs text-neutral-500 mb-2 uppercase">Quick Add:</div>
+                <div className="font-mono text-xs text-muted mb-2 uppercase">Quick Add:</div>
                 <div className="flex flex-wrap gap-2">
                     {POPULAR_SUBS.map((subName) => (
                         <button
@@ -121,8 +121,8 @@ export function SubsManager() {
                             className={clsx(
                                 "px-3 py-1 border font-mono text-xs uppercase transition-colors",
                                 subs.some(s => s.name === subName)
-                                    ? "border-neutral-700 text-neutral-600 cursor-not-allowed"
-                                    : "border-white text-white hover:bg-white hover:text-black"
+                                    ? "border-muted text-muted cursor-not-allowed"
+                                    : "border-border text-foreground hover:bg-foreground hover:text-background"
                             )}
                         >
                             r/{subName}

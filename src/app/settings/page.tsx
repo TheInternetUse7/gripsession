@@ -49,7 +49,7 @@ export default function SettingsPage() {
     };
 
     return (
-        <main className="min-h-screen bg-black text-white">
+        <main className="min-h-screen bg-background text-foreground">
             <Header />
 
             <div className="max-w-4xl mx-auto px-6 py-8">
@@ -209,13 +209,13 @@ export default function SettingsPage() {
                     <div className="space-y-3">
                         <button
                             onClick={handleExport}
-                            className="w-full px-4 py-3 bg-white text-black font-mono text-sm uppercase border border-white hover:bg-black hover:text-white transition-colors"
+                            className="w-full px-4 py-3 bg-foreground text-background font-mono text-sm uppercase border border-border hover:bg-background hover:text-foreground transition-colors"
                         >
                             [EXPORT DATA]
                         </button>
                         <button
                             onClick={handleImport}
-                            className="w-full px-4 py-3 bg-black text-white font-mono text-sm uppercase border border-white hover:bg-white hover:text-black transition-colors"
+                            className="w-full px-4 py-3 bg-background text-foreground font-mono text-sm uppercase border border-border hover:bg-foreground hover:text-background transition-colors"
                         >
                             [IMPORT DATA]
                         </button>
@@ -226,8 +226,8 @@ export default function SettingsPage() {
                             [CLEAR ALL DATA]
                         </button>
                     </div>
-                    <div className="mt-3 p-3 border border-neutral-700 bg-neutral-900">
-                        <p className="font-mono text-xs text-neutral-400">
+                    <div className="mt-3 p-3 border border-border bg-surface">
+                        <p className="font-mono text-xs text-muted">
                             Export saves your subs, favorites, and settings to a JSON file. Import restores from a backup file.
                         </p>
                     </div>
@@ -236,3 +236,4 @@ export default function SettingsPage() {
         </main>
     );
 }
+

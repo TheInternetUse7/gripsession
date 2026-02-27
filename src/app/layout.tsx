@@ -34,7 +34,7 @@ export default function RootLayout({
         <meta name="description" content="Digital Brutalism" />
       </head>
       <body
-        className={`${playfair.variable} ${jetbrainsMono.variable} antialiased bg-black text-white`}
+        className={`${playfair.variable} ${jetbrainsMono.variable} antialiased`}
       >
         {children}
       </body>

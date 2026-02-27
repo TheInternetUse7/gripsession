@@ -12,7 +12,7 @@ export default function FavoritesPage() {
   const [selectedItem, setSelectedItem] = useState<MediaItem | null>(null);
 
   return (
-    <main className="min-h-screen bg-black text-white">
+    <main className="min-h-screen bg-background text-foreground">
       <Header />
       
       <div className="p-4">
@@ -31,3 +31,4 @@ export default function FavoritesPage() {
     </main>
   );
 }
+

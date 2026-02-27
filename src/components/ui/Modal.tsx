@@ -59,7 +59,7 @@ export function Modal({ item, onClose }: ModalProps) {
 
     return (
         <div
-            className="fixed inset-0 z-[200] bg-black flex items-center justify-center"
+            className="fixed inset-0 z-[200] bg-background/95 flex items-center justify-center"
             onClick={onClose}
         >
             {/* Controls - Top Right */}
@@ -72,21 +72,21 @@ export function Modal({ item, onClose }: ModalProps) {
                     className={clsx(
                         "font-mono text-xs px-3 py-2 border",
                         isSaved
-                            ? "bg-white text-black border-white"
-                            : "bg-black text-white border-white hover:bg-white hover:text-black"
+                            ? "bg-foreground text-background border-border"
+                            : "bg-background text-foreground border-border hover:bg-foreground hover:text-background"
                     )}
                 >
                     {isSaved ? "[SAVED]" : "[SAVE]"}
                 </button>
                 <button
                     onClick={openSource}
-                    className="font-mono text-xs px-3 py-2 border border-white bg-black text-white hover:bg-white hover:text-black"
+                    className="font-mono text-xs px-3 py-2 border border-border bg-background text-foreground hover:bg-foreground hover:text-background"
                 >
                     [SOURCE]
                 </button>
                 <button
                     onClick={onClose}
-                    className="font-mono text-xs px-3 py-2 border border-white bg-black text-white hover:bg-white hover:text-black"
+                    className="font-mono text-xs px-3 py-2 border border-border bg-background text-foreground hover:bg-foreground hover:text-background"
                 >
                     [ESC]
                 </button>

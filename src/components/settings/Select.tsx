@@ -12,13 +12,13 @@ export function Select<T extends string>({ label, description, value, options, o
             <div className="flex-1">
                 <div className="font-mono text-sm uppercase">{label}</div>
                 {description && (
-                    <div className="font-mono text-xs text-neutral-500 mt-1">{description}</div>
+                    <div className="font-mono text-xs text-muted mt-1">{description}</div>
                 )}
             </div>
             <select
                 value={value}
                 onChange={(e) => onChange(e.target.value as T)}
-                className="bg-black text-white border border-white px-3 py-1 font-mono text-sm uppercase cursor-pointer hover:bg-white hover:text-black transition-colors"
+                className="bg-background text-foreground border border-border px-3 py-1 font-mono text-sm uppercase cursor-pointer hover:bg-foreground hover:text-background transition-colors"
             >
                 {options.map((option) => (
                     <option key={option.value} value={option.value}>

@@ -106,7 +106,7 @@ export default function Home() {
   }, [hasMore, isLoadingMore, setSize, size, error]);
 
   return (
-    <main className="min-h-screen bg-black text-white">
+    <main className="min-h-screen bg-background text-foreground">
       <Header />
 
       <div className="p-1">

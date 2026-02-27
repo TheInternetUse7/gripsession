@@ -32,8 +32,17 @@ export default function Home() {
 
   // Stable cache key that only changes when feed-affecting settings change
   const cacheKey = useMemo(
-    () => `${subsKey}:${settings.sortBy}:${settings.topTimeframe || 'day'}:${settings.postsPerLoad}`,
-    [subsKey, settings.sortBy, settings.topTimeframe, settings.postsPerLoad]
+    () =>
+      `${subsKey}:${settings.sortBy}:${settings.topTimeframe || 'day'}:${settings.postsPerLoad}:${settings.allowImages}:${settings.allowVideos}:${settings.allowGifs}`,
+    [
+      subsKey,
+      settings.sortBy,
+      settings.topTimeframe,
+      settings.postsPerLoad,
+      settings.allowImages,
+      settings.allowVideos,
+      settings.allowGifs,
+    ]
   );
 
   const getKey = useCallback((pageIndex: number, previousPageData: any) => {

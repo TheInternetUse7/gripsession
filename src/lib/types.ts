@@ -1,10 +1,16 @@
 export type MediaSource = 'reddit' | 'future-source-1' | 'future-source-2';
 
+export interface GalleryItem {
+    url: string;
+    type: 'image' | 'video';
+}
+
 export interface MediaItem {
     id: string;
     url: string; // Direct link to mp4/jpg
     thumbnail: string;
     type: 'video' | 'image' | 'gallery';
+    galleryItems?: GalleryItem[];
     aspectRatio: number;
     sourceUrl: string; // Reddit thread
     title: string;
@@ -42,4 +48,5 @@ export interface AppSettings {
     // Advanced
     postsPerLoad: number; // 10-50
     preloadNext: boolean;
+    galleryPreloadCount: number; // 0-10
 }

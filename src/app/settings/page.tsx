@@ -202,6 +202,14 @@ export default function SettingsPage() {
                         checked={settings.preloadNext}
                         onChange={(checked) => updateSettings({ preloadNext: checked })}
                     />
+                    <Slider
+                        label="Gallery Preload"
+                        description="Number of upcoming gallery images to preload in modal"
+                        value={settings.galleryPreloadCount}
+                        min={0}
+                        max={10}
+                        onChange={(value) => updateSettings({ galleryPreloadCount: value })}
+                    />
                 </SettingsSection>
 
                 {/* Data Management */}

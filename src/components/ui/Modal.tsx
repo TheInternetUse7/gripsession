@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { MediaItem } from "@/lib/types";
 import { useStore } from "@/lib/store";
 import clsx from "clsx";
@@ -11,13 +11,33 @@ interface ModalProps {
 }
 
 export function Modal({ item, onClose }: ModalProps) {
-    const videoRef = useRef<HTMLVideoElement>(null);
-    const { favorites, addFavorite, removeFavorite, settings } = useStore();
+    if (!item) return null;
+    return <ModalContent key={item.id} item={item} onClose={onClose} />;
+}
 
-    const isSaved = item ? favorites.some(f => f.id === item.id) : false;
+interface ModalContentProps {
+    item: MediaItem;
+    onClose: () => void;
+}
+
+function ModalContent({ item, onClose }: ModalContentProps) {
+    const videoRef = useRef<HTMLVideoElement>(null);
+    const preloadedImagesRef = useRef<Set<string>>(new Set());
+    const { favorites, addFavorite, removeFavorite, settings } = useStore();
+    const [galleryIndex, setGalleryIndex] = useState(0);
+
+    const isSaved = favorites.some(f => f.id === item.id);
+    const galleryItems = useMemo(
+        () =>
+            item.type === 'gallery' && item.galleryItems?.length
+                ? item.galleryItems
+                : [{ url: item.url, type: item.type === 'video' ? 'video' as const : 'image' as const }],
+        [item]
+    );
+    const activeMedia = galleryItems[galleryIndex] ?? null;
+    const hasGalleryNav = item.type === 'gallery' && galleryItems.length > 1;
 
     const toggleSave = () => {
-        if (!item) return;
         if (isSaved) {
             removeFavorite(item.id);
         } else {
@@ -26,36 +46,71 @@ export function Modal({ item, onClose }: ModalProps) {
     };
 
     const openSource = () => {
-        if (item) {
-            window.open(item.sourceUrl, '_blank');
-        }
+        window.open(item.sourceUrl, '_blank');
+    };
+
+    const goPrev = () => {
+        if (!hasGalleryNav) return;
+        setGalleryIndex((prev) => (prev - 1 + galleryItems.length) % galleryItems.length);
+    };
+
+    const goNext = () => {
+        if (!hasGalleryNav) return;
+        setGalleryIndex((prev) => (prev + 1) % galleryItems.length);
     };
 
     useEffect(() => {
-        const handleEsc = (e: KeyboardEvent) => {
+        const handleKeyDown = (e: KeyboardEvent) => {
             if (e.key === 'Escape') {
                 onClose();
+                return;
+            }
+            if (!hasGalleryNav) return;
+
+            if (e.key === 'ArrowLeft') {
+                setGalleryIndex((prev) => (prev - 1 + galleryItems.length) % galleryItems.length);
+                return;
+            }
+            if (e.key === 'ArrowRight') {
+                setGalleryIndex((prev) => (prev + 1) % galleryItems.length);
             }
         };
 
-        if (item) {
-            document.addEventListener('keydown', handleEsc);
-            document.body.style.overflow = 'hidden';
-        }
+        document.addEventListener('keydown', handleKeyDown);
+        document.body.style.overflow = 'hidden';
 
         return () => {
-            document.removeEventListener('keydown', handleEsc);
+            document.removeEventListener('keydown', handleKeyDown);
             document.body.style.overflow = '';
         };
-    }, [item, onClose]);
+    }, [onClose, hasGalleryNav, galleryItems.length]);
 
     useEffect(() => {
-        if (item?.type === 'video' && videoRef.current) {
+        if (activeMedia?.type === 'video' && videoRef.current) {
             videoRef.current.play().catch(() => { });
         }
-    }, [item]);
+    }, [activeMedia?.type, activeMedia?.url]);
 
-    if (!item) return null;
+    useEffect(() => {
+        if (item.type !== 'gallery') return;
+
+        const preloadCount = Math.max(0, Math.floor(settings.galleryPreloadCount));
+        if (preloadCount === 0 || galleryItems.length <= 1) return;
+
+        const maxLookahead = Math.min(preloadCount, galleryItems.length - 1);
+        for (let offset = 1; offset <= maxLookahead; offset++) {
+            const index = (galleryIndex + offset) % galleryItems.length;
+            const media = galleryItems[index];
+            if (!media || media.type !== 'image') continue;
+            if (preloadedImagesRef.current.has(media.url)) continue;
+
+            const image = new Image();
+            image.src = media.url;
+            preloadedImagesRef.current.add(media.url);
+        }
+    }, [item.type, galleryItems, galleryIndex, settings.galleryPreloadCount]);
+
+    if (!activeMedia) return null;
 
     return (
         <div
@@ -97,10 +152,11 @@ export function Modal({ item, onClose }: ModalProps) {
                 className="max-w-[90vw] max-h-[90vh] flex items-center justify-center"
                 onClick={(e) => e.stopPropagation()}
             >
-                {item.type === 'video' ? (
+                {activeMedia.type === 'video' ? (
                     <video
                         ref={videoRef}
-                        src={item.url}
+                        key={activeMedia.url}
+                        src={activeMedia.url}
                         className="max-w-full max-h-[90vh] object-contain"
                         controls
                         autoPlay
@@ -110,17 +166,42 @@ export function Modal({ item, onClose }: ModalProps) {
                     />
                 ) : (
                     <img
-                        src={item.url}
+                        key={activeMedia.url}
+                        src={activeMedia.url}
                         alt={item.title}
                         className="max-w-full max-h-[90vh] object-contain"
                     />
                 )}
             </div>
 
+            {hasGalleryNav && (
+                <>
+                    <button
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            goPrev();
+                        }}
+                        className="absolute left-4 top-1/2 -translate-y-1/2 font-mono text-xs px-3 py-2 border border-border bg-background/90 text-foreground hover:bg-foreground hover:text-background"
+                    >
+                        [PREV]
+                    </button>
+                    <button
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            goNext();
+                        }}
+                        className="absolute right-4 top-1/2 -translate-y-1/2 font-mono text-xs px-3 py-2 border border-border bg-background/90 text-foreground hover:bg-foreground hover:text-background"
+                    >
+                        [NEXT]
+                    </button>
+                </>
+            )}
+
             {/* Title - Bottom */}
             <div className="absolute bottom-4 left-4 right-4 text-center">
                 <p className="font-mono text-xs text-neutral-500 truncate">
                     {item.title}
+                    {hasGalleryNav && `  [${galleryIndex + 1}/${galleryItems.length}]`}
                 </p>
             </div>
         </div>

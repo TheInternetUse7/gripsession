@@ -1,10 +1,22 @@
-import { MediaItem, AppSettings } from '@/lib/types';
+import { MediaItem, AppSettings, GalleryItem } from '@/lib/types';
 
 const DIRECT_IMAGE_REGEX = /\.(?:jpeg|jpg|gif|png)(?:$|[?#])/i;
 const DIRECT_VIDEO_REGEX = /\.(?:mp4|webm)(?:$|[?#])/i;
 const GIF_REGEX = /\.gif(?:$|[?#])/i;
 const GIFV_REGEX = /\.gifv(?=$|[?#])/i;
 const MP4_REGEX = /\.mp4(?:$|[?#])/i;
+
+interface RedditMediaMetadata {
+    e?: string;
+    m?: string;
+    s?: {
+        u?: string;
+        mp4?: string;
+        gif?: string;
+        x?: number;
+        y?: number;
+    };
+}
 
 interface RedditPostData {
     id: string;
@@ -36,7 +48,7 @@ interface RedditPostData {
     gallery_data?: {
         items: Array<{ media_id: string; id: number }>;
     };
-    media_metadata?: Record<string, { s: { u: string; x: number; y: number } }>;
+    media_metadata?: Record<string, RedditMediaMetadata>;
     post_hint?: string;
     domain?: string;
 }
@@ -50,6 +62,73 @@ interface RedditListing {
         children?: RedditPost[];
         after?: string | null;
     };
+}
+
+function decodeRedditUrl(url: string): string {
+    return url.replace(/&amp;/g, '&');
+}
+
+function normalizeMediaUrl(url: string): string {
+    const decoded = decodeRedditUrl(url);
+    if (decoded.includes('imgur.com') && GIFV_REGEX.test(decoded)) {
+        return decoded.replace(GIFV_REGEX, '.mp4');
+    }
+    return decoded;
+}
+
+function getMediaTypeFromUrl(url: string): GalleryItem['type'] | null {
+    if (DIRECT_VIDEO_REGEX.test(url)) return 'video';
+    if (DIRECT_IMAGE_REGEX.test(url)) return 'image';
+    return null;
+}
+
+function isAllowedBySettings(type: GalleryItem['type'], url: string, settings: AppSettings): boolean {
+    if (type === 'video') return settings.allowVideos;
+
+    const isGif = GIF_REGEX.test(url);
+    if (isGif) return settings.allowGifs;
+    return settings.allowImages;
+}
+
+function parseGalleryItems(data: Partial<RedditPostData>, settings: AppSettings): GalleryItem[] {
+    const galleryDataItems = data.gallery_data?.items;
+    const mediaMetadata = data.media_metadata;
+    if (!galleryDataItems || !mediaMetadata) return [];
+
+    const galleryItems: GalleryItem[] = [];
+
+    for (const galleryDataItem of galleryDataItems) {
+        const metadata = mediaMetadata[galleryDataItem.media_id];
+        if (!metadata?.s) continue;
+
+        const candidates: Array<{ url: string; type?: GalleryItem['type'] }> = [];
+        if (typeof metadata.s.mp4 === 'string') candidates.push({ url: metadata.s.mp4, type: 'video' });
+        if (typeof metadata.s.gif === 'string') candidates.push({ url: metadata.s.gif });
+        if (typeof metadata.s.u === 'string') candidates.push({ url: metadata.s.u });
+
+        let picked: GalleryItem | null = null;
+        for (const candidate of candidates) {
+            const normalizedUrl = normalizeMediaUrl(candidate.url);
+            let type = candidate.type ?? getMediaTypeFromUrl(normalizedUrl);
+
+            if (!type) {
+                const mime = metadata.m?.toLowerCase() ?? '';
+                if (mime.startsWith('video/')) type = 'video';
+                if (mime.startsWith('image/')) type = 'image';
+            }
+
+            if (!type) continue;
+            if (type === 'video' && normalizedUrl.includes('redgifs.com/watch')) continue;
+            if (!isAllowedBySettings(type, normalizedUrl, settings)) continue;
+
+            picked = { url: normalizedUrl, type };
+            break;
+        }
+
+        if (picked) galleryItems.push(picked);
+    }
+
+    return galleryItems;
 }
 
 export interface RedditResponse {
@@ -123,63 +202,61 @@ export async function fetchFeed(
                 if (!id || !permalink || !primaryUrl) return null;
 
                 let type: MediaItem['type'] = 'image';
-                let url = primaryUrl;
+                let url = normalizeMediaUrl(primaryUrl);
                 const aspectRatio = 1;
+
+                const galleryItems = parseGalleryItems(data, settings);
+                if (galleryItems.length > 0) {
+                    return {
+                        id: id,
+                        url: galleryItems[0].url,
+                        thumbnail: thumbnail,
+                        type: 'gallery',
+                        galleryItems: galleryItems,
+                        aspectRatio: aspectRatio,
+                        sourceUrl: permalink.startsWith('http') ? permalink : `https://reddit.com${permalink}`,
+                        title: title,
+                        source: 'reddit',
+                    };
+                }
 
                 // 1. Handle Reddit Video (Direct)
                 const redditVideoUrl = data.secure_media?.reddit_video?.fallback_url;
                 if (data.is_video === true && typeof redditVideoUrl === 'string') {
                     type = 'video';
-                    url = redditVideoUrl;
+                    url = normalizeMediaUrl(redditVideoUrl);
                 }
                 // 2. Handle RedGifs
                 else if (data.domain === 'redgifs.com' || url.includes('redgifs.com')) {
                     const redgifsFallback = data.preview?.reddit_video_preview?.fallback_url;
                     if (typeof redgifsFallback === 'string') {
                         type = 'video';
-                        url = redgifsFallback;
+                        url = normalizeMediaUrl(redgifsFallback);
                     } else {
                         return null;
                     }
                 }
-                // 3. Handle Imgur (.gifv -> .mp4)
-                else if (url.includes('imgur.com') && GIFV_REGEX.test(url)) {
-                    type = 'video';
-                    url = url.replace(GIFV_REGEX, '.mp4');
-                }
-                // 4. Handle Galleries (Reddit Metadata)
-                else if (data.gallery_data && data.media_metadata) {
-                    const firstId = data.gallery_data.items?.[0]?.media_id;
-                    const meta = firstId ? data.media_metadata[firstId] : null;
-                    const galleryUrl = meta?.s?.u;
-                    if (typeof galleryUrl === 'string') {
-                        url = galleryUrl.replace(/&amp;/g, '&');
-                    }
-                    type = 'image';
-                }
-                // 5. Generic MP4 detection
+                // 3. Generic MP4 detection
                 else if (MP4_REGEX.test(url)) {
                     type = 'video';
                 }
 
                 // Validation
+                const resolvedType = type === 'video' ? 'video' : (getMediaTypeFromUrl(url) ?? 'image');
                 const isDirectImage = DIRECT_IMAGE_REGEX.test(url);
-                const isDirectVideo = DIRECT_VIDEO_REGEX.test(url) || type === 'video';
+                const isDirectVideo = DIRECT_VIDEO_REGEX.test(url) || resolvedType === 'video';
 
                 if (!isDirectImage && !isDirectVideo) return null;
-                if (type === 'video' && url.includes('redgifs.com/watch')) return null;
+                if (resolvedType === 'video' && url.includes('redgifs.com/watch')) return null;
 
                 // Apply media type filters
-                const isGif = GIF_REGEX.test(url);
-                if (type === 'image' && !isGif && !settings.allowImages) return null;
-                if (type === 'image' && isGif && !settings.allowGifs) return null;
-                if (type === 'video' && !settings.allowVideos) return null;
+                if (!isAllowedBySettings(resolvedType, url, settings)) return null;
 
                 return {
                     id: id,
                     url: url,
                     thumbnail: thumbnail,
-                    type: type,
+                    type: resolvedType,
                     aspectRatio: aspectRatio,
                     sourceUrl: permalink.startsWith('http') ? permalink : `https://reddit.com${permalink}`,
                     title: title,

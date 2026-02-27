@@ -59,6 +59,10 @@ function CardContent({ item, onClick }: CardProps) {
     const [isPlaying, setIsPlaying] = useState(false);
     const [isLoaded, setIsLoaded] = useState(false);
     const [hasError, setHasError] = useState(false);
+    const galleryPreview = item.type === 'gallery' ? item.galleryItems?.[0] : null;
+    const displayType = galleryPreview?.type ?? (item.type === 'video' ? 'video' : 'image');
+    const displayUrl = galleryPreview?.url ?? item.url;
+    const galleryCount = item.type === 'gallery' ? (item.galleryItems?.length ?? 0) : 0;
 
     const isSaved = favorites.some(f => f.id === item.id);
 
@@ -77,7 +81,8 @@ function CardContent({ item, onClick }: CardProps) {
     };
 
     useEffect(() => {
-        if (item.type !== "video" || !settings.autoplay) return;
+        // Only autoplay standalone video posts. Gallery previews stay static.
+        if (displayType !== "video" || item.type === 'gallery' || !settings.autoplay) return;
 
         const observer = new IntersectionObserver(
             (entries) => {
@@ -101,15 +106,15 @@ function CardContent({ item, onClick }: CardProps) {
         return () => {
             observer.disconnect();
         };
-    }, [item.type, settings.autoplay]);
+    }, [displayType, item.type, settings.autoplay]);
 
-    if (item.type === "image") {
+    if (displayType === "image") {
         return (
             <div className="relative w-full bg-surface group cursor-pointer min-h-[200px]" onClick={handleClick}>
                 {!isLoaded && !hasError && <SkeletonOverlay />}
                 {hasError && <ErrorOverlay />}
                 <img
-                    src={item.url}
+                    src={displayUrl}
                     alt={item.title}
                     className={clsx(
                         "w-full h-auto object-cover block transition-opacity duration-300",
@@ -119,6 +124,13 @@ function CardContent({ item, onClick }: CardProps) {
                     onLoad={() => setIsLoaded(true)}
                     onError={() => setHasError(true)}
                 />
+                {galleryCount > 1 && (
+                    <div className="absolute top-2 left-2 pointer-events-none">
+                        <span className="font-mono text-[10px] px-2 py-1 border border-border bg-background text-foreground">
+                            [{galleryCount}]
+                        </span>
+                    </div>
+                )}
                 <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
                     <button
                         onClick={toggleSave}
@@ -143,7 +155,7 @@ function CardContent({ item, onClick }: CardProps) {
             {hasError && <ErrorOverlay />}
             <video
                 ref={videoRef}
-                src={item.url}
+                src={displayUrl}
                 className={clsx(
                     "w-full h-auto object-cover block transition-opacity duration-300",
                     isLoaded ? "opacity-100" : "opacity-0"
@@ -154,6 +166,13 @@ function CardContent({ item, onClick }: CardProps) {
                 onLoadedData={() => setIsLoaded(true)}
                 onError={() => setHasError(true)}
             />
+            {galleryCount > 1 && (
+                <div className="absolute top-2 left-2 pointer-events-none">
+                    <span className="font-mono text-[10px] px-2 py-1 border border-border bg-background text-foreground">
+                        [{galleryCount}]
+                    </span>
+                </div>
+            )}
             <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
                 <button
                     onClick={toggleSave}

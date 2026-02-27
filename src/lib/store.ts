@@ -67,6 +67,7 @@ export const useStore = create<State>()(
                 // Advanced
                 postsPerLoad: 25,
                 preloadNext: false,
+                galleryPreloadCount: 3,
             },
             viewedItems: new Set(),
 

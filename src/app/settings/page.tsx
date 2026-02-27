@@ -6,6 +6,7 @@ import { Toggle } from "@/components/settings/Toggle";
 import { Select } from "@/components/settings/Select";
 import { Slider } from "@/components/settings/Slider";
 import { SubsManager } from "@/components/settings/SubsManager";
+import { TemplatesManager } from "@/components/settings/TemplatesManager";
 import { useStore } from "@/lib/store";
 
 export default function SettingsPage() {
@@ -58,6 +59,11 @@ export default function SettingsPage() {
                 {/* Subs Management */}
                 <SettingsSection title="Subs (Reddit)">
                     <SubsManager />
+                </SettingsSection>
+
+                {/* Templates */}
+                <SettingsSection title="Sub Templates">
+                    <TemplatesManager />
                 </SettingsSection>
 
                 {/* Media Type Filters */}
@@ -236,7 +242,7 @@ export default function SettingsPage() {
                     </div>
                     <div className="mt-3 p-3 border border-border bg-surface">
                         <p className="font-mono text-xs text-muted">
-                            Export saves your subs, favorites, and settings to a JSON file. Import restores from a backup file.
+                            Export saves your subs, templates, favorites, and settings to a JSON file. Import restores from a backup file.
                         </p>
                     </div>
                 </SettingsSection>

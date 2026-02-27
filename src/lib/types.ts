@@ -23,6 +23,13 @@ export interface Sub {
     source: MediaSource;
 }
 
+export interface SubTemplate {
+    id: string;
+    name: string;
+    subs: string[];
+    updatedAt: string;
+}
+
 export interface AppSettings {
     // Media Filters
     allowImages: boolean;

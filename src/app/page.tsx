@@ -6,7 +6,7 @@ import { Header } from "@/components/ui/Header";
 import { MasonryGrid } from "@/components/feed/MasonryGrid";
 import { Modal } from "@/components/ui/Modal";
 import { useStore } from "@/lib/store";
-import { fetchFeed } from "@/lib/parsers/reddit";
+import { fetchFeed, RedditResponse } from "@/lib/parsers/reddit";
 import { MediaItem } from "@/lib/types";
 
 export default function Home() {
@@ -45,11 +45,12 @@ export default function Home() {
     ]
   );
 
-  const getKey = useCallback((pageIndex: number, previousPageData: any) => {
+  const getKey = useCallback((pageIndex: number, previousPageData: RedditResponse | null) => {
+    const after = previousPageData?.after ?? null;
     if (activeSubsRef.current.length === 0) return null;
-    if (pageIndex > 0 && !previousPageData?.after) return null;
+    if (pageIndex > 0 && !after) return null;
     if (pageIndex === 0) return ['feed', cacheKey, null];
-    return ['feed', cacheKey, previousPageData.after];
+    return ['feed', cacheKey, after];
   }, [cacheKey]);
 
   // Stable fetcher using refs

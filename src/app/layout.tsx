@@ -1,10 +1,9 @@
 "use client";
 
-import type { Metadata } from "next";
 import { Playfair_Display, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { useStore } from "@/lib/store";
-import { useEffect, useState } from "react";
+import { useSyncExternalStore } from "react";
 
 const playfair = Playfair_Display({
   variable: "--font-serif",
@@ -16,17 +15,17 @@ const jetbrainsMono = JetBrains_Mono({
   subsets: ["latin"],
 });
 
+const subscribe = () => () => {};
+const getClientSnapshot = () => true;
+const getServerSnapshot = () => false;
+
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   const { settings } = useStore();
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  const mounted = useSyncExternalStore(subscribe, getClientSnapshot, getServerSnapshot);
 
   return (
     <html lang="en" data-theme={mounted ? settings.theme : 'dark'}>

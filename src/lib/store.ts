@@ -29,6 +29,10 @@ interface State {
     importData: (json: string) => void;
 }
 
+type PersistedState = Pick<State, 'favorites' | 'subs' | 'settings'> & {
+    viewedItems: string[];
+};
+
 export const useStore = create<State>()(
     persist(
         (set, get) => ({
@@ -137,11 +141,16 @@ export const useStore = create<State>()(
                 settings: state.settings,
                 viewedItems: Array.from(state.viewedItems),
             }),
-            merge: (persistedState: any, currentState) => ({
-                ...currentState,
-                ...persistedState,
-                viewedItems: new Set(persistedState?.viewedItems || []),
-            }),
+            merge: (persistedState: unknown, currentState) => {
+                const state = (persistedState ?? {}) as Partial<PersistedState>;
+                const viewedItems = Array.isArray(state.viewedItems) ? state.viewedItems : [];
+
+                return {
+                    ...currentState,
+                    ...state,
+                    viewedItems: new Set(viewedItems),
+                };
+            },
         }
     )
 );

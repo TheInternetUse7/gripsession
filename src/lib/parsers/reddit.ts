@@ -1,5 +1,11 @@
 import { MediaItem, AppSettings } from '@/lib/types';
 
+const DIRECT_IMAGE_REGEX = /\.(?:jpeg|jpg|gif|png)(?:$|[?#])/i;
+const DIRECT_VIDEO_REGEX = /\.(?:mp4|webm)(?:$|[?#])/i;
+const GIF_REGEX = /\.gif(?:$|[?#])/i;
+const GIFV_REGEX = /\.gifv(?=$|[?#])/i;
+const MP4_REGEX = /\.mp4(?:$|[?#])/i;
+
 interface RedditPost {
     data: {
         id: string;
@@ -103,9 +109,9 @@ export async function fetchFeed(
                 }
             }
             // 3. Handle Imgur (.gifv -> .mp4)
-            else if (url.includes('imgur.com') && url.endsWith('.gifv')) {
+            else if (url.includes('imgur.com') && GIFV_REGEX.test(url)) {
                 type = 'video';
-                url = url.replace('.gifv', '.mp4');
+                url = url.replace(GIFV_REGEX, '.mp4');
             }
             // 4. Handle Galleries (Reddit Metadata)
             else if (data.gallery_data && data.media_metadata) {
@@ -117,19 +123,19 @@ export async function fetchFeed(
                 type = 'image';
             }
             // 5. Generic MP4 detection
-            else if (url.endsWith('.mp4')) {
+            else if (MP4_REGEX.test(url)) {
                 type = 'video';
             }
 
             // Validation
-            const isDirectImage = url.match(/\.(jpeg|jpg|gif|png)$/) != null;
-            const isDirectVideo = (url.match(/\.(mp4|webm)$/) != null) || (type === 'video');
+            const isDirectImage = DIRECT_IMAGE_REGEX.test(url);
+            const isDirectVideo = DIRECT_VIDEO_REGEX.test(url) || type === 'video';
 
             if (!isDirectImage && !isDirectVideo) return null;
             if (type === 'video' && url.includes('redgifs.com/watch')) return null;
 
             // Apply media type filters
-            const isGif = url.endsWith('.gif');
+            const isGif = GIF_REGEX.test(url);
             if (type === 'image' && !isGif && !settings.allowImages) return null;
             if (type === 'image' && isGif && !settings.allowGifs) return null;
             if (type === 'video' && !settings.allowVideos) return null;

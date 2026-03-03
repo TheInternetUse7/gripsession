@@ -1,36 +1,64 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# gripsession
 
-## Getting Started
+a grimy little media feed app for reddit where you pick your subs, scroll forever, save what you like.
 
-First, run the development server:
+built with next.js + react + typescript, all client-side.
+
+## what this does
+
+- pulls media posts from `old.reddit.com/r/<subs>` using your selected sort + filters
+- supports images, videos, and gallery posts (with prev/next nav in modal)
+- infinite scroll feed with swr pagination
+- lets you save favorites and view them on `/favorites`
+- lets you manage subs and sub templates on `/settings`
+- persists your settings/data locally (zustand + persist middleware)
+- supports theme switching (`dark`, `light`, `oled`)
+- supports import/export for full app data and template-only backups
+
+## routes
+
+- `/` main feed
+- `/settings` subs, templates, filters, playback, display, feed, backup controls
+- `/favorites` saved posts grid
+
+## quick start
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+then open `http://localhost:3000`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## scripts
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- `npm run dev` start dev server
+- `npm run build` production build
+- `npm run start` run production build
+- `npm run lint` run eslint
 
-## Learn More
+## how state works
 
-To learn more about Next.js, take a look at the following resources:
+global store is in `src/lib/store.ts`:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+persisted slices:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- favorites
+- subs
+- templates
+- settings
+- viewed items
 
-## Deploy on Vercel
+## media fetching notes
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- fetcher lives in `src/lib/parsers/reddit.ts`
+- uses `old.reddit.com` json listings (`hot`, `new`, `top`)
+- applies media filters before items hit the UI
+- skips unsupported links and malformed posts instead of crashing the whole page
+- reddit can rate-limit (`429`), so the UI retries a bit and then shows an error state
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## heads up
+
+- this app is client-rendered and currently only wired to reddit as a source.
+- if all subs are disabled/removed, home feed will be empty until you enable/add some.
+- import/export expects json produced by this app.

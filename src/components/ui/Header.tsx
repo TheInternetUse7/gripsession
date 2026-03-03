@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useStore } from '@/lib/store';
 import { useState } from 'react';
 import { SearchOverlay } from './SearchOverlay';
+import { InstallPrompt } from '@/components/pwa/InstallPrompt';
 
 export function Header() {
     const { subs } = useStore();
@@ -13,7 +14,10 @@ export function Header() {
 
     return (
         <>
-            <header className="sticky top-0 z-50 w-full border-b border-border bg-background px-4 py-3">
+            <header
+                className="sticky top-0 z-50 w-full border-b border-border bg-background px-4 py-3"
+                style={{ paddingTop: 'max(env(safe-area-inset-top), 0px)' }}
+            >
                 <div className="flex items-center justify-between">
                     <Link href="/" className="font-serif text-3xl font-bold tracking-tighter text-foreground uppercase antialiased">
                         Gripsession
@@ -36,6 +40,7 @@ export function Header() {
                         </span>
                     </div>
                 </div>
+                <InstallPrompt />
             </header>
 
             <SearchOverlay isOpen={showSearch} onClose={() => setShowSearch(false)} />

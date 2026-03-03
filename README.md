@@ -62,3 +62,10 @@ persisted slices:
 - this app is client-rendered and currently only wired to reddit as a source.
 - if all subs are disabled/removed, home feed will be empty until you enable/add some.
 - import/export expects json produced by this app.
+
+## pwa support
+
+- installable on android chrome, ios safari (add to home screen), and desktop chromium.
+- service worker caches app shell + recently viewed feed/media for read-only offline use.
+- offline fallback route is available at `/offline`.
+- in development, service workers are automatically unregistered to avoid stale caches.

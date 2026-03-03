@@ -56,4 +56,11 @@ export interface AppSettings {
     postsPerLoad: number; // 10-50
     preloadNext: boolean;
     galleryPreloadCount: number; // 0-10
+
+    // PWA
+    installPromptEngagementCount: number;
+    installPromptCooldownDays: number;
+    installPromptDismissedAt?: string;
+    installPromptInstalledAt?: string;
+    installPromptLastSeenAt?: string;
 }

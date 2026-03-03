@@ -31,6 +31,41 @@ const STARTER_TEMPLATES: SubTemplate[] = [
     },
 ];
 
+const DEFAULT_SETTINGS: AppSettings = {
+    // Media Filters
+    allowImages: true,
+    allowVideos: true,
+    allowGifs: true,
+
+    // Playback
+    autoplay: true,
+    muted: true,
+    loopVideos: true,
+
+    // Display
+    columns: 4,
+    cardSize: 'medium',
+    showTitles: 'hover',
+    theme: 'dark',
+
+    // Feed
+    sortBy: 'hot',
+    topTimeframe: 'day',
+    hideViewed: false,
+
+    // Advanced
+    postsPerLoad: 25,
+    preloadNext: false,
+    galleryPreloadCount: 3,
+
+    // PWA
+    installPromptEngagementCount: 0,
+    installPromptCooldownDays: 7,
+    installPromptDismissedAt: undefined,
+    installPromptInstalledAt: undefined,
+    installPromptLastSeenAt: undefined,
+};
+
 function cloneStarterTemplates(): SubTemplate[] {
     return STARTER_TEMPLATES.map((template) => ({
         ...template,
@@ -182,33 +217,7 @@ export const useStore = create<State>()(
                 { name: 'simps', enabled: true, source: 'reddit' },
             ],
             templates: cloneStarterTemplates(),
-            settings: {
-                // Media Filters
-                allowImages: true,
-                allowVideos: true,
-                allowGifs: true,
-
-                // Playback
-                autoplay: true,
-                muted: true,
-                loopVideos: true,
-
-                // Display
-                columns: 4,
-                cardSize: 'medium',
-                showTitles: 'hover',
-                theme: 'dark',
-
-                // Feed
-                sortBy: 'hot',
-                topTimeframe: 'day',
-                hideViewed: false,
-
-                // Advanced
-                postsPerLoad: 25,
-                preloadNext: false,
-                galleryPreloadCount: 3,
-            },
+            settings: DEFAULT_SETTINGS,
             viewedItems: new Set(),
 
             addFavorite: (item) =>
@@ -408,10 +417,15 @@ export const useStore = create<State>()(
         }),
         {
             name: 'gripsession-storage-v2',
-            version: 3,
+            version: 4,
             migrate: (persistedState: unknown, version) => {
                 const state = (persistedState ?? {}) as Partial<PersistedState>;
-                if (version >= 3) return state;
+                if (version >= 4) {
+                    return {
+                        ...state,
+                        settings: { ...DEFAULT_SETTINGS, ...state.settings },
+                    };
+                }
 
                 const existingTemplates = normalizeTemplates(state.templates);
                 return {
@@ -419,6 +433,7 @@ export const useStore = create<State>()(
                     templates: existingTemplates.length > 0
                         ? existingTemplates
                         : cloneStarterTemplates(),
+                    settings: { ...DEFAULT_SETTINGS, ...state.settings },
                 };
             },
             partialize: (state) => ({
@@ -441,6 +456,7 @@ export const useStore = create<State>()(
                     ...state,
                     subs: hasSubs ? normalizeSubs(state.subs) : currentState.subs,
                     templates: hasTemplates ? normalizeTemplates(state.templates) : currentState.templates,
+                    settings: { ...currentState.settings, ...state.settings },
                     viewedItems: new Set(viewedItems),
                 };
             },

@@ -21,7 +21,7 @@ export function Header() {
                 className="sticky top-0 z-50 w-full border-b border-border bg-background px-3 py-2 sm:px-4 sm:py-3"
                 style={{ paddingTop: 'max(env(safe-area-inset-top), 0px)' }}
             >
-                <div className="flex items-center justify-between gap-3">
+                <div className="flex min-h-10 items-center justify-between gap-3">
                     <Link
                         href="/"
                         onClick={closeMenu}
@@ -33,17 +33,17 @@ export function Header() {
                     <div className="hidden sm:flex flex-wrap items-center gap-x-3 gap-y-2">
                         <button
                             onClick={() => setShowSearch(true)}
-                            className="font-mono text-[11px] sm:text-sm uppercase text-muted hover:text-foreground whitespace-nowrap"
+                            className="inline-flex h-8 items-center font-mono text-[11px] sm:text-sm uppercase text-muted hover:text-foreground whitespace-nowrap"
                         >
                             [SEARCH]
                         </button>
-                        <Link href="/settings" className="font-mono text-[11px] sm:text-sm uppercase text-muted hover:text-foreground whitespace-nowrap">
+                        <Link href="/settings" className="inline-flex h-8 items-center font-mono text-[11px] sm:text-sm uppercase text-muted hover:text-foreground whitespace-nowrap">
                             [SETTINGS]
                         </Link>
-                        <Link href="/favorites" className="font-mono text-[11px] sm:text-sm uppercase text-muted hover:text-foreground whitespace-nowrap">
+                        <Link href="/favorites" className="inline-flex h-8 items-center font-mono text-[11px] sm:text-sm uppercase text-muted hover:text-foreground whitespace-nowrap">
                             [SAVED]
                         </Link>
-                        <span className="font-mono text-[10px] sm:text-xs text-muted whitespace-nowrap">
+                        <span className="inline-flex h-8 items-center font-mono text-[10px] sm:text-xs text-muted whitespace-nowrap">
                             {activeSubs.length} SUBS
                         </span>
                     </div>
@@ -51,7 +51,7 @@ export function Header() {
                     <button
                         type="button"
                         onClick={() => setIsMenuOpen((value) => !value)}
-                        className="sm:hidden font-mono text-[11px] uppercase border border-border px-2 py-1 text-muted hover:text-foreground"
+                        className="sm:hidden inline-flex h-8 items-center font-mono text-[11px] uppercase border border-border px-2 text-muted hover:text-foreground"
                         aria-expanded={isMenuOpen}
                         aria-label="Toggle menu"
                     >
@@ -61,7 +61,7 @@ export function Header() {
 
                 {isMenuOpen && (
                     <div className="mt-2 border-t border-border pt-2 sm:hidden">
-                        <div className="flex flex-col gap-2">
+                        <div className="flex flex-col gap-2 pt-1">
                             <button
                                 onClick={() => {
                                     setShowSearch(true);

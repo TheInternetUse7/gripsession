@@ -53,8 +53,8 @@ export default function SettingsPage() {
         <main className="min-h-screen bg-background text-foreground">
             <Header />
 
-            <div className="max-w-4xl mx-auto px-6 py-8">
-                <h1 className="font-serif text-5xl uppercase mb-8">Settings</h1>
+            <div className="max-w-4xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
+                <h1 className="font-serif text-4xl sm:text-5xl uppercase mb-6 sm:mb-8">Settings</h1>
 
                 {/* Subs Management */}
                 <SettingsSection title="Subs (Reddit)">

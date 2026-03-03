@@ -119,13 +119,13 @@ function ModalContent({ item, onClose }: ModalContentProps) {
         >
             {/* Controls - Top Right */}
             <div
-                className="absolute top-4 right-4 flex gap-2 z-10"
+                className="absolute top-3 left-3 right-3 flex flex-wrap justify-end gap-2 z-10"
                 onClick={(e) => e.stopPropagation()}
             >
                 <button
                     onClick={toggleSave}
                     className={clsx(
-                        "font-mono text-xs px-3 py-2 border",
+                        "font-mono text-[11px] sm:text-xs px-2.5 py-1.5 sm:px-3 sm:py-2 border",
                         isSaved
                             ? "bg-foreground text-background border-border"
                             : "bg-background text-foreground border-border hover:bg-foreground hover:text-background"
@@ -135,13 +135,13 @@ function ModalContent({ item, onClose }: ModalContentProps) {
                 </button>
                 <button
                     onClick={openSource}
-                    className="font-mono text-xs px-3 py-2 border border-border bg-background text-foreground hover:bg-foreground hover:text-background"
+                    className="font-mono text-[11px] sm:text-xs px-2.5 py-1.5 sm:px-3 sm:py-2 border border-border bg-background text-foreground hover:bg-foreground hover:text-background"
                 >
                     [SOURCE]
                 </button>
                 <button
                     onClick={onClose}
-                    className="font-mono text-xs px-3 py-2 border border-border bg-background text-foreground hover:bg-foreground hover:text-background"
+                    className="font-mono text-[11px] sm:text-xs px-2.5 py-1.5 sm:px-3 sm:py-2 border border-border bg-background text-foreground hover:bg-foreground hover:text-background"
                 >
                     [ESC]
                 </button>
@@ -149,7 +149,7 @@ function ModalContent({ item, onClose }: ModalContentProps) {
 
             {/* Media Content */}
             <div
-                className="max-w-[90vw] max-h-[90vh] flex items-center justify-center"
+                className="max-w-[94vw] sm:max-w-[90vw] max-h-[82vh] sm:max-h-[90vh] flex items-center justify-center"
                 onClick={(e) => e.stopPropagation()}
             >
                 {activeMedia.type === 'video' ? (
@@ -157,7 +157,7 @@ function ModalContent({ item, onClose }: ModalContentProps) {
                         ref={videoRef}
                         key={activeMedia.url}
                         src={activeMedia.url}
-                        className="max-w-full max-h-[90vh] object-contain"
+                        className="max-w-full max-h-[82vh] sm:max-h-[90vh] object-contain"
                         controls
                         autoPlay
                         loop
@@ -169,7 +169,7 @@ function ModalContent({ item, onClose }: ModalContentProps) {
                         key={activeMedia.url}
                         src={activeMedia.url}
                         alt={item.title}
-                        className="max-w-full max-h-[90vh] object-contain"
+                        className="max-w-full max-h-[82vh] sm:max-h-[90vh] object-contain"
                     />
                 )}
             </div>
@@ -181,7 +181,7 @@ function ModalContent({ item, onClose }: ModalContentProps) {
                             e.stopPropagation();
                             goPrev();
                         }}
-                        className="absolute left-4 top-1/2 -translate-y-1/2 font-mono text-xs px-3 py-2 border border-border bg-background/90 text-foreground hover:bg-foreground hover:text-background"
+                        className="absolute left-3 bottom-14 sm:bottom-auto sm:left-4 sm:top-1/2 sm:-translate-y-1/2 font-mono text-[11px] sm:text-xs px-2.5 py-1.5 sm:px-3 sm:py-2 border border-border bg-background/90 text-foreground hover:bg-foreground hover:text-background"
                     >
                         [PREV]
                     </button>
@@ -190,7 +190,7 @@ function ModalContent({ item, onClose }: ModalContentProps) {
                             e.stopPropagation();
                             goNext();
                         }}
-                        className="absolute right-4 top-1/2 -translate-y-1/2 font-mono text-xs px-3 py-2 border border-border bg-background/90 text-foreground hover:bg-foreground hover:text-background"
+                        className="absolute right-3 bottom-14 sm:bottom-auto sm:right-4 sm:top-1/2 sm:-translate-y-1/2 font-mono text-[11px] sm:text-xs px-2.5 py-1.5 sm:px-3 sm:py-2 border border-border bg-background/90 text-foreground hover:bg-foreground hover:text-background"
                     >
                         [NEXT]
                     </button>
@@ -198,8 +198,8 @@ function ModalContent({ item, onClose }: ModalContentProps) {
             )}
 
             {/* Title - Bottom */}
-            <div className="absolute bottom-4 left-4 right-4 text-center">
-                <p className="font-mono text-xs text-neutral-500 truncate">
+            <div className="absolute bottom-3 sm:bottom-4 left-3 right-3 sm:left-4 sm:right-4 text-center">
+                <p className="font-mono text-[11px] sm:text-xs text-neutral-500 break-words">
                     {item.title}
                     {hasGalleryNav && `  [${galleryIndex + 1}/${galleryItems.length}]`}
                 </p>

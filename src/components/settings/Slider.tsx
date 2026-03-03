@@ -11,14 +11,14 @@ interface SliderProps {
 export function Slider({ label, description, value, min, max, step = 1, onChange }: SliderProps) {
     return (
         <div>
-            <div className="flex items-center justify-between mb-2">
+            <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between mb-2">
                 <div className="flex-1">
                     <div className="font-mono text-sm uppercase">{label}</div>
                     {description && (
                         <div className="font-mono text-xs text-muted mt-1">{description}</div>
                     )}
                 </div>
-                <div className="font-mono text-lg font-bold">{value}</div>
+                <div className="font-mono text-lg font-bold self-start sm:self-auto">{value}</div>
             </div>
             <input
                 type="range"

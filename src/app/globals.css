@@ -65,6 +65,12 @@ body {
   padding-left: env(safe-area-inset-left);
 }
 
+html,
+body {
+  max-width: 100%;
+  overflow-x: clip;
+}
+
 img,
 video {
   display: block;

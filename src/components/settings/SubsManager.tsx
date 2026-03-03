@@ -37,17 +37,17 @@ export function SubsManager() {
     return (
         <div className="space-y-4">
             {/* Add New Sub */}
-            <div className="flex gap-2">
+            <div className="flex flex-col sm:flex-row gap-2">
                 <Input
                     value={inputValue}
                     onChange={(e) => setInputValue(e.target.value)}
                     onKeyDown={handleKeyDown}
                     placeholder="SUBREDDIT NAME..."
-                    className="flex-1"
+                    className="flex-1 min-w-0"
                 />
                 <button
                     onClick={handleAdd}
-                    className="px-4 py-2 bg-foreground text-background font-mono text-xs uppercase border border-border hover:bg-background hover:text-foreground transition-colors"
+                    className="w-full sm:w-auto px-4 py-2 bg-foreground text-background font-mono text-xs uppercase border border-border hover:bg-background hover:text-foreground transition-colors"
                 >
                     [ADD]
                 </button>
@@ -69,7 +69,7 @@ export function SubsManager() {
                         subs.map((sub) => (
                             <div
                                 key={sub.name}
-                                className="flex items-center gap-3 p-3 border-b border-border last:border-b-0 hover:bg-surface transition-colors"
+                                className="flex flex-wrap items-center gap-2 sm:gap-3 p-3 border-b border-border last:border-b-0 hover:bg-surface transition-colors"
                             >
                                 <button
                                     onClick={() => toggleSub(sub.name)}
@@ -89,9 +89,9 @@ export function SubsManager() {
                                         </svg>
                                     )}
                                 </button>
-                                <div className="flex-1">
+                                <div className="flex-1 min-w-0">
                                     <span className={clsx(
-                                        "font-mono text-sm",
+                                        "font-mono text-sm break-all",
                                         sub.enabled ? "text-foreground" : "text-muted"
                                     )}>
                                         r/{sub.name}
@@ -99,7 +99,7 @@ export function SubsManager() {
                                 </div>
                                 <button
                                     onClick={() => removeSub(sub.name)}
-                                    className="font-mono text-xs px-2 py-1 border border-border hover:bg-foreground hover:text-background transition-colors text-muted"
+                                    className="font-mono text-[11px] sm:text-xs px-2 py-1 border border-border hover:bg-foreground hover:text-background transition-colors text-muted"
                                 >
                                     [REMOVE]
                                 </button>

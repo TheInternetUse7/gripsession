@@ -15,8 +15,8 @@ export default function FavoritesPage() {
     <main className="min-h-screen bg-background text-foreground">
       <Header />
       
-      <div className="p-4">
-        <h1 className="font-serif text-4xl mb-6 uppercase">Saved</h1>
+      <div className="p-3 sm:p-4">
+        <h1 className="font-serif text-3xl sm:text-4xl mb-4 sm:mb-6 uppercase">Saved</h1>
         
         {favorites.length === 0 ? (
           <div className="flex h-[50vh] items-center justify-center font-mono text-sm text-neutral-500">

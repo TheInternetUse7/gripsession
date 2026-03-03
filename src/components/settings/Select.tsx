@@ -8,7 +8,7 @@ interface SelectProps<T extends string> {
 
 export function Select<T extends string>({ label, description, value, options, onChange }: SelectProps<T>) {
     return (
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
             <div className="flex-1">
                 <div className="font-mono text-sm uppercase">{label}</div>
                 {description && (
@@ -18,7 +18,7 @@ export function Select<T extends string>({ label, description, value, options, o
             <select
                 value={value}
                 onChange={(e) => onChange(e.target.value as T)}
-                className="bg-background text-foreground border border-border px-3 py-1 font-mono text-sm uppercase cursor-pointer hover:bg-foreground hover:text-background transition-colors"
+                className="w-full sm:w-auto bg-background text-foreground border border-border px-3 py-1 font-mono text-sm uppercase cursor-pointer hover:bg-foreground hover:text-background transition-colors max-w-full"
             >
                 {options.map((option) => (
                     <option key={option.value} value={option.value}>

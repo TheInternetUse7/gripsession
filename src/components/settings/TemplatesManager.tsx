@@ -133,7 +133,7 @@ export function TemplatesManager() {
                 </div>
             </div>
 
-            <div className="flex gap-2">
+            <div className="flex flex-col sm:flex-row gap-2">
                 <Input
                     value={templateName}
                     onChange={(event) => setTemplateName(event.target.value)}
@@ -141,11 +141,11 @@ export function TemplatesManager() {
                         if (event.key === 'Enter') handleSaveTemplate();
                     }}
                     placeholder="TEMPLATE NAME..."
-                    className="flex-1"
+                    className="flex-1 min-w-0"
                 />
                 <button
                     onClick={handleSaveTemplate}
-                    className="px-4 py-2 bg-foreground text-background font-mono text-xs uppercase border border-border hover:bg-background hover:text-foreground transition-colors"
+                    className="w-full sm:w-auto px-4 py-2 bg-foreground text-background font-mono text-xs uppercase border border-border hover:bg-background hover:text-foreground transition-colors"
                 >
                     [SAVE]
                 </button>
@@ -166,14 +166,14 @@ export function TemplatesManager() {
                                 key={template.id}
                                 className="p-3 border-b border-border last:border-b-0 space-y-2 hover:bg-surface transition-colors"
                             >
-                                <div className="flex items-center justify-between gap-3">
-                                    <div>
-                                        <div className="font-mono text-sm uppercase">{template.name}</div>
+                                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-3">
+                                    <div className="min-w-0">
+                                        <div className="font-mono text-sm uppercase break-words">{template.name}</div>
                                         <div className="font-mono text-xs text-muted">
                                             {template.subs.length} SUBS | UPDATED {isoDateOnly(template.updatedAt)}
                                         </div>
                                     </div>
-                                    <div className="flex gap-2">
+                                    <div className="flex flex-wrap gap-2">
                                         <button
                                             onClick={() => handleApplyTemplate(template.id, template.name)}
                                             className="px-2 py-1 border border-border font-mono text-xs uppercase hover:bg-foreground hover:text-background transition-colors"

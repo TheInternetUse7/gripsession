@@ -59,10 +59,10 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 z-[100] bg-background">
-            <div className="sticky top-0 z-50 border-b border-border bg-background p-4">
+        <div className="fixed inset-0 z-[100] bg-background overflow-x-hidden">
+            <div className="sticky top-0 z-50 border-b border-border bg-background p-3 sm:p-4">
                 <div className="flex items-center justify-between mb-2">
-                    <h2 className="font-serif text-2xl uppercase">Search</h2>
+                    <h2 className="font-serif text-xl sm:text-2xl uppercase">Search</h2>
                     <button
                         onClick={onClose}
                         className="font-mono text-xs border border-border px-2 py-1 hover:bg-foreground hover:text-background"
@@ -80,7 +80,7 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
                 />
             </div>
 
-            <div className="p-4 overflow-auto h-[calc(100vh-120px)]">
+            <div className="p-3 sm:p-4 overflow-auto h-[calc(100dvh-110px)] sm:h-[calc(100dvh-120px)]">
                 {isLoading && (
                     <div className="flex items-center justify-center h-full font-mono text-sm text-neutral-500 animate-pulse">
                         SEARCHING...

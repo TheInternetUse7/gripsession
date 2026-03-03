@@ -7,7 +7,7 @@ interface ToggleProps {
 
 export function Toggle({ label, description, checked, onChange }: ToggleProps) {
     return (
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex-1">
                 <div className="font-mono text-sm uppercase">{label}</div>
                 {description && (
@@ -17,7 +17,7 @@ export function Toggle({ label, description, checked, onChange }: ToggleProps) {
             <button
                 onClick={() => onChange(!checked)}
                 className={`
-                    w-14 h-7 border-2 relative transition-all duration-200
+                    w-14 h-7 border-2 relative transition-all duration-200 self-start sm:self-auto
                     ${checked
                         ? 'bg-foreground border-border'
                         : 'bg-transparent border-muted'

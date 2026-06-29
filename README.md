@@ -24,18 +24,18 @@ built with next.js + react + typescript, all client-side.
 ## quick start
 
 ```bash
-npm install
-npm run dev
+pnpm install
+pnpm dev
 ```
 
 then open `http://localhost:3000`.
 
 ## scripts
 
-- `npm run dev` start dev server
-- `npm run build` production build
-- `npm run start` run production build
-- `npm run lint` run eslint
+- `pnpm dev` start dev server
+- `pnpm build` production build
+- `pnpm start` run production build
+- `pnpm lint` run eslint
 
 ## how state works
 

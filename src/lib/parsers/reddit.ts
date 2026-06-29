@@ -136,6 +136,42 @@ export interface RedditResponse {
     after: string | null;
 }
 
+function jsonpFetch(url: string): Promise<any> {
+    return new Promise((resolve, reject) => {
+        const callbackName = 'reddit_jsonp_' + Math.random().toString(36).slice(2, 10);
+        const script = document.createElement('script');
+        
+        const separator = url.includes('?') ? '&' : '?';
+        script.src = `${url}${separator}jsonp=${callbackName}`;
+        script.async = true;
+        
+        (window as any)[callbackName] = (data: any) => {
+            cleanup();
+            resolve(data);
+        };
+        
+        script.onerror = () => {
+            cleanup();
+            reject(new Error('JSONP request failed'));
+        };
+        
+        const timeoutId = setTimeout(() => {
+            cleanup();
+            reject(new Error('JSONP request timed out'));
+        }, 15000);
+        
+        function cleanup() {
+            clearTimeout(timeoutId);
+            if (script.parentNode) {
+                script.parentNode.removeChild(script);
+            }
+            delete (window as any)[callbackName];
+        }
+        
+        document.body.appendChild(script);
+    });
+}
+
 export async function fetchFeed(
     subreddits: string[],
     after: string | null = null,
@@ -158,26 +194,37 @@ export async function fetchFeed(
         url += `&after=${after}`;
     }
 
-    const response = await fetch(url, {
-        cache: 'no-store',
-        headers: {
-            'Accept': 'application/json',
-        },
-    });
-
-    if (!response.ok) {
-        const error = new Error(`Failed to fetch reddit feed: ${response.status}`) as Error & { status: number };
-        error.status = response.status;
-        throw error;
-    }
-
     let json: RedditListing;
-    try {
-        json = (await response.json()) as RedditListing;
-    } catch {
-        const error = new Error('Failed to parse reddit feed response') as Error & { status: number };
-        error.status = response.status;
-        throw error;
+
+    if (typeof window !== 'undefined') {
+        try {
+            json = await jsonpFetch(url) as RedditListing;
+        } catch (err: any) {
+            const error = new Error(err.message || 'Failed to fetch reddit feed via JSONP') as Error & { status: number };
+            error.status = 500;
+            throw error;
+        }
+    } else {
+        const response = await fetch(url, {
+            cache: 'no-store',
+            headers: {
+                'Accept': 'application/json',
+            },
+        });
+
+        if (!response.ok) {
+            const error = new Error(`Failed to fetch reddit feed: ${response.status}`) as Error & { status: number };
+            error.status = response.status;
+            throw error;
+        }
+
+        try {
+            json = (await response.json()) as RedditListing;
+        } catch {
+            const error = new Error('Failed to parse reddit feed response') as Error & { status: number };
+            error.status = response.status;
+            throw error;
+        }
     }
 
     const posts = Array.isArray(json.data?.children) ? json.data.children : [];
